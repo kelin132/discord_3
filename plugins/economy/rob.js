@@ -1,4 +1,4 @@
-import { getUser, saveUser, requireRegistration, isRegistered, addHistory } from "./database.js";
+import { getUser, saveUser, requireRegistration, isRegistered, addHistory, jailUser } from "./database.js";
 import { hasActiveGun } from "../../lib/economySecurity.mjs";
 import { compactMoney } from "../../lib/compactMoney.mjs";
 
@@ -180,15 +180,16 @@ export default {
     } else {
       const fine   = Math.floor(amount * 0.7);
       robber.money = Math.max(0, robber.money - fine);
+      robber.jailed = true;
+      robber.jailUntil = Date.now() + 10 * 60 * 1000;
       await saveUser(sender, robber);
+      await jailUser(sender, 10 * 60 * 1000);
       await addHistory(sender, "rob", -fine, `Rob failed — fined $${fine.toLocaleString()}`);
 
       return robReply({
         sock, jid, msg, discord,
         title: "🚓 Robbery Failed!",
-        description: discordTargetId
-          ? `<@${discord.message.author.id}> got caught trying to rob ${tag}.`
-          : `${tag} got caught trying to rob the target.`,
+        description: "The robber was fined and jailed for 10 minutes.",
         color: "#E74C3C",
         fields: [
           { name: "Fine (penalty)", value: `🪙 ${fmt(fine)}`, inline: true },
@@ -197,7 +198,7 @@ export default {
           ? [`discord:${discord.message.author.id}`, `discord:${discordTargetId}`]
           : mentions,
         text:
-`you were caught and charge a fine of *-${fmt(fine)}*`
+`You were caught, fined *-${fmt(fine)}*, and jailed for 10 minutes.`
       });
     }
   }

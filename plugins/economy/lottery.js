@@ -12,8 +12,9 @@ import {
   REQUIRED_LOTTERY_ENTRIES,
   queueLotteryAnnouncement,
 } from "../../lib/lotteryDraw.mjs";
+import { getEconomyPreviewConfig } from "../../lib/economyPreview.mjs";
 
-const TICKET_PRICE  = 500;
+const TICKET_PRICE  = 15_000;
 const MAX_TICKETS   = 1;
 const MIN_JACKPOT   = 10_000_000;
 const MAX_JACKPOT   = 50_000_000;
@@ -116,7 +117,7 @@ export default {
       });
       lot = await getLottery();
 
-      await reply("✅ You have entered the global lottery.");
+      await reply(`You have bought a ticket for $${cost.toLocaleString()}, Goodluck!\n${getEconomyPreviewConfig("lottery")?.url ?? ""}`);
 
       if (lot.totalTickets >= REQUIRED_LOTTERY_ENTRIES) {
         const guildId = discord?.message?.guildId || msg.guildId || null;

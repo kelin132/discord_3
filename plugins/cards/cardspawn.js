@@ -7,11 +7,11 @@ import {
 import { spawnDiscordCardNow } from "../../lib/discordSpawners.mjs";
 
 export default {
-  name: "cardspawn",
-  aliases: ["spawncard", "cardauto"],
+  name: "cards",
+  aliases: ["cardspawn", "spawncard", "cardauto"],
   description: "Enable or disable automatic card spawning every 12–15 minutes",
   category: "cards",
-  usage: ".cardspawn on | .cardspawn off | .cardspawn status",
+  usage: ".cards on | .cards off | .cards status",
   isAdmin: true,
   isOwner: true,
 
