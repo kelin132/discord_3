@@ -15,7 +15,7 @@ export const DEFAULTS = {
   bankLimit:     BASE_BANK_LIMIT,
   bankUpgradeLevel: 0,
   orbs:          0,           // premium currency earned from dig/fish/events
-  diamonds:      0,           // rare currency earned from lucky activities
+  diamonds:      0,           // legacy balance, folded into genesisCrystals on read
   membershipTier: "none",
   isPremium:     false,
   genesisCrystals: 0,
@@ -77,6 +77,10 @@ export async function getUser(id) {
   if (!user) return { ...DEFAULTS };
   const { _id, ...rest } = user;
   const merged = { ...DEFAULTS, ...rest };
+  // Fold legacy Diamonds and newer Genesis Crystal grants into one balance.
+  merged.genesisCrystals =
+    (Number(user.genesisCrystals) || 0) + (Number(user.diamonds) || 0);
+  merged.diamonds = 0;
   merged.totalWealth = Number(merged.money || 0) + Number(merged.bank || 0);
   // Retire the old card/service entries from existing inventories. Bank
   // access is now available by default and capacity is controlled by tiers.
@@ -90,7 +94,7 @@ export async function getUser(id) {
     money:    merged.money    ?? 0,
     bank:     merged.bank     ?? 0,
     xp:       merged.xp       ?? 0,
-    diamonds: merged.diamonds ?? 0,
+    genesisCrystals: merged.genesisCrystals ?? 0,
     orbs:     merged.orbs     ?? 0,
     workXp:   merged.workXp   ?? 0,
     completedShifts: merged.completedShifts ?? 0,
@@ -103,7 +107,7 @@ const WALLET_CAP = 500_000_000_000; // 500 Billion max in wallet
 // Fields that must be updated atomically with $inc to prevent race conditions.
 // Every other field is safe to $set because it isn't modified by concurrent commands.
 const ATOMIC_FIELDS = new Set([
-  "money", "bank", "xp", "diamonds", "orbs",
+  "money", "bank", "xp", "genesisCrystals", "orbs",
   "completedShifts", "workXp",
 ]);
 
@@ -148,6 +152,29 @@ export async function saveUser(id, data) {
 
   // ── Build update operation ─────────────────────────────────────────────────
   if (_snap) {
+    const hasCrystalBalance = Object.prototype.hasOwnProperty.call(safeData, "genesisCrystals");
+    const crystalDelta = hasCrystalBalance
+      ? (Number(safeData.genesisCrystals) || 0) - (Number(_snap.genesisCrystals) || 0)
+      : 0;
+    delete safeData.genesisCrystals;
+    delete safeData.diamonds;
+    if (crystalDelta !== 0) {
+      await db.collection("users").updateOne(
+        { _id: id },
+        [{
+          $set: {
+            genesisCrystals: {
+              $add: [
+                { $ifNull: ["$genesisCrystals", 0] },
+                { $ifNull: ["$diamonds", 0] },
+                crystalDelta,
+              ],
+            },
+            diamonds: 0,
+          },
+        }],
+      );
+    }
     // Existing user: use $inc for numeric fields (race-condition-safe),
     // and $set for everything else (timestamps, flags, arrays, strings, etc.)
     const incOp = {};
@@ -200,6 +227,7 @@ export async function saveUser(id, data) {
     }
   } else {
     // New user (no snapshot) — safe to $set everything since nobody else has this doc yet
+    delete safeData.diamonds;
     safeData.totalWealth = Number(safeData.money || 0) + Number(safeData.bank || 0);
     await db.collection("users").updateOne(
       { _id: id },
@@ -529,15 +557,17 @@ export async function clearAuctionHold(id, auctionId) {
 }
 
 /**
- * Award rare Diamonds to an in-memory user when a lucky activity hits.
+ * Award Genesis Crystals to an in-memory user when a lucky activity hits.
  * Callers persist the user with saveUser after adding the reward.
  */
 export function maybeAwardDiamonds(user, chance = 0.02, min = 1, max = 2) {
   if (Math.random() >= chance) return 0;
   const amount = Math.floor(Math.random() * (max - min + 1)) + min;
-  user.diamonds = (user.diamonds || 0) + amount;
+  user.genesisCrystals = (user.genesisCrystals || 0) + amount;
   return amount;
 }
+
+export const maybeAwardCrystals = maybeAwardDiamonds;
 
 // ─── Level-up helper ─────────────────────────────────────────────────────────
 
@@ -759,12 +789,18 @@ export async function setPlayerFields(id, fields) {
   const user = await findUserByIdentity(id, { projection: { _id: 1, registered: 1 } });
   if (!user || user.registered !== true) return false;
   const { totalWealth: _ignoredTotalWealth, ...safeFields } = fields;
+  const crystalValue = safeFields.genesisCrystals;
+  delete safeFields.genesisCrystals;
+  delete safeFields.diamonds;
   const result = await db.collection("users").updateOne(
     { _id: user._id, registered: true },
     [
       { $set: safeFields },
       {
         $set: {
+          ...(crystalValue === undefined
+            ? {}
+            : { genesisCrystals: { $literal: Math.max(0, Number(crystalValue) || 0) }, diamonds: 0 }),
           totalWealth: {
             $add: [
               { $ifNull: ["$money", 0] },

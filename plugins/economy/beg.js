@@ -110,13 +110,13 @@ export default {
 │ 🍃 *Flavour* :: _${pick(sender.split("@")[0], amount.toLocaleString())}_
 │
 │ 💰 *Earned*  :: \`+${fmt(amount)}\`
-│ 💰 *Wallet*  :: \`${fmt(user.money)}\`${diamondReward ? `\n│ 💎 *Bonus*   :: \`+${diamondReward}\` Gem${diamondReward === 1 ? "" : "s"}` : ""}
+│ 💰 *Wallet*  :: \`${fmt(user.money)}\`${diamondReward ? `\n│ 💎 *Bonus*   :: \`+${diamondReward}\` Genesis Crystal${diamondReward === 1 ? "" : "s"}` : ""}
 │
 │ 🙏 *Thank you!* Keep grinding!
 ╰───────────────❀`
       , [
         `🙏 ${pick("", amount.toLocaleString())}`,
-        ...(diamondReward ? [`💎 Bonus: +${diamondReward} Gem${diamondReward === 1 ? "" : "s"}`] : []),
+        ...(diamondReward ? [`💎 Bonus: +${diamondReward} Genesis Crystal${diamondReward === 1 ? "" : "s"}`] : []),
       ].join(" ")
     );
   },

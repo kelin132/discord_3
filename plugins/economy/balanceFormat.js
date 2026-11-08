@@ -16,7 +16,7 @@ function row(icon, label, value) {
 export function formatAccountBalance({
   wallet = 0,
   bank = 0,
-  gems = 0,
+  crystals = 0,
   orbs,
   bankLimit,
   netWorth = Number(wallet ?? 0) + Number(bank ?? 0),
@@ -25,7 +25,7 @@ export function formatAccountBalance({
   const rows = [
     row("$", "Wallet ", money(wallet)),
     row("🏦", "Bank   ", `${money(bank)} / ${money(bankLimit ?? bankLimitForUser({}))}`),
-    row("💎", "Gems   ", number(gems)),
+    row("💎", "Genesis Crystals", number(crystals)),
   ];
 
   if (orbs !== undefined && orbs !== null) rows.push(row("🔮", "Orbs   ", number(orbs)));

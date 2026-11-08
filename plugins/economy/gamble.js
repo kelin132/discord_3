@@ -48,7 +48,7 @@ export default {
               },
               { name: "Wallet", value: fmt(balance), inline: true },
               ...(diamondReward
-                ? [{ name: "Bonus", value: `💎 +${diamondReward} Gems`, inline: true }]
+                ? [{ name: "Bonus", value: `💎 +${diamondReward} Genesis Crystals`, inline: true }]
                 : []),
             ],
           },
@@ -60,7 +60,7 @@ export default {
         won,
         bet: amount,
         got: spin,
-        details: [diamondReward ? `💎 Bonus: +${diamondReward} Gem${diamondReward === 1 ? "" : "s"}` : ""],
+        details: [diamondReward ? `💎 Bonus: +${diamondReward} Genesis Crystal${diamondReward === 1 ? "" : "s"}` : ""],
         net,
         balance,
       }));

@@ -72,7 +72,7 @@ export default {
             `${flavour}.`,
             `Net: ${net >= 0 ? "+" : "-"}${fmt(Math.abs(net))}.`,
             `Wallet: ${fmt(balance)}.`,
-            ...(diamondReward ? [`Gem bonus: +${diamondReward}.`] : []),
+            ...(diamondReward ? [`Genesis Crystal bonus: +${diamondReward}.`] : []),
           ].join(" "),
           mentions: [sender],
         }, { quoted: msg });
@@ -84,7 +84,7 @@ export default {
           won,
           bet: amount,
           got: flavour,
-          details: [diamondReward ? `💎 Bonus: +\`${diamondReward}\` Gem${diamondReward === 1 ? "" : "s"}` : ""],
+          details: [diamondReward ? `💎 Bonus: +\`${diamondReward}\` Genesis Crystal${diamondReward === 1 ? "" : "s"}` : ""],
           net,
           balance,
         }),

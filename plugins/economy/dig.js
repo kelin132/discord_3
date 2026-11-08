@@ -113,20 +113,20 @@ export default {
 │ 💰 *Cash*    :: *${fmt(user.money || 0)}*
 │ 🔮 *Orbs*    :: *${user.orbs || 0}*
 │ 🎒 *Items*   :: *${(user.inventory || []).length}*
-│ ⭐ *XP*      :: *+10*${diamondReward ? `\n│ 💎 *Bonus*   :: *+${diamondReward} Gem${diamondReward === 1 ? "" : "s"}*` : ""}${leveled ? `\n│\n│ 🎉 *LEVEL UP!* — Now Level ${user.level}` : ""}
+│ ⭐ *XP*      :: *+10*${diamondReward ? `\n│ 💎 *Bonus*   :: *+${diamondReward} Genesis Crystal${diamondReward === 1 ? "" : "s"}*` : ""}${leveled ? `\n│\n│ 🎉 *LEVEL UP!* — Now Level ${user.level}` : ""}
 ╰───────────────❀`,
       {
         color: leveled ? "#F1C40F" : "#57B894",
         simpleText: [
           resultLine,
-          ...(diamondReward ? [`Gem bonus: +${diamondReward}.`] : []),
+          ...(diamondReward ? [`Genesis Crystal bonus: +${diamondReward}.`] : []),
           ...(leveled ? [`Level up: ${user.level}.`] : []),
         ].join(" "),
         fields: [
           { name: "Result", value: resultType, inline: true },
           { name: "Reward", value: resultLine.replaceAll("*", ""), inline: false },
           ...(diamondReward
-            ? [{ name: "Gem bonus", value: `+${diamondReward}`, inline: true }]
+            ? [{ name: "Genesis Crystal bonus", value: `+${diamondReward}`, inline: true }]
             : []),
         ],
       },

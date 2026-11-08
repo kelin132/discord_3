@@ -18,7 +18,7 @@ export default {
     const text = formatAccountBalance({
       wallet: user.money,
       bank: user.bank,
-      gems: user.diamonds,
+      crystals: user.genesisCrystals,
       bankLimit: bankLimitForUser(user),
       footerLines: ["Buy higher bank limits in .shop banking."],
     });

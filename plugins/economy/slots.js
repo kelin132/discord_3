@@ -118,7 +118,7 @@ export default {
       won,
       bet: amount,
       got: `${a} ${b} ${c}`,
-      details: [resultMsg, diamondReward ? `💎 Bonus: +${diamondReward} Gem${diamondReward === 1 ? "" : "s"}` : ""],
+      details: [resultMsg, diamondReward ? `💎 Bonus: +${diamondReward} Genesis Crystal${diamondReward === 1 ? "" : "s"}` : ""],
       net,
       balance: user.money,
     });

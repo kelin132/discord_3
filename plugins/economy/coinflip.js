@@ -87,7 +87,7 @@ export default {
               { name: "Payout", value: payout, inline: true },
               { name: "Wallet", value: fmt(user.money), inline: false },
               ...(diamondReward
-                ? [{ name: "Bonus", value: `+${diamondReward} gem${diamondReward === 1 ? "" : "s"}`, inline: true }]
+                ? [{ name: "Bonus", value: `+${diamondReward} Genesis Crystal${diamondReward === 1 ? "" : "s"}`, inline: true }]
                 : []),
             ],
           },
@@ -102,7 +102,7 @@ export default {
         got: resultDetails,
         details: [
           wonResult ? `💎 Reward: ${fmt(amount * 2)}` : "",
-          diamondReward ? `💎 Bonus: +${diamondReward} Gem${diamondReward === 1 ? "" : "s"}` : "",
+          diamondReward ? `💎 Bonus: +${diamondReward} Genesis Crystal${diamondReward === 1 ? "" : "s"}` : "",
         ],
         net: wonResult ? amount : -amount,
         balance: user.money,
