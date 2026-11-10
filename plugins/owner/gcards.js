@@ -34,14 +34,14 @@ function ownedCard(card) {
     price: card.price || 0,
     series: card.series || "Unknown",
     media: card.media || null,
-    mediaType: (card.tierNum === "6" || card.tierNum === "S") ? "gif" : "image",
+    mediaType: card.mediaType || ((card.tierNum === "6" || card.tierNum === "S") ? "gif" : "image"),
     obtainedAt: new Date(),
   };
 }
 
 function parseTierQualifiedQuery(input) {
   const value = String(input || "").trim();
-  const match = value.match(/^(.*?)(?:\s*(?:\||#|\btier\s*)\s*(common|uncommon|rare|epic|legendary|mythical|secret|[1-6s]))$/i);
+  const match = value.match(/^(.*?)(?:\s*(?:\||#|\btier\s*)\s*(common|uncommon|rare|epic|legendary|mythical|secret|ssr|sr|ur|[1-6scrx]))$/i);
   if (!match) return { query: value, tierNum: null };
   return { query: match[1].trim(), tierNum: normalizeTier(match[2]) };
 }
