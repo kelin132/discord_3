@@ -4,6 +4,7 @@
 import { findTrainerByUsername, getTrainer, pickLeadFromParty } from "../../lib/pokemon/players.mjs";
 import { healPartyAndGet } from "../../lib/pokemon/pokemonDb.mjs";
 import { createWebBattleRoom, webBattleUrl } from "../../lib/webBattleRoom.mjs";
+import { findActivePokemonBattle } from "../../lib/pokemon/activeBattle.mjs";
 import {
   challengeMentionJid,
   challengeTargetLabel,
@@ -174,6 +175,29 @@ export default {
 
     const challengerJid = challenger.jid || sender;
     const opponentJid = opponent.jid || targetJid;
+
+    let activeBattle;
+    try {
+      const checks = await Promise.all([
+        findActivePokemonBattle(challengerJid),
+        findActivePokemonBattle(opponentJid),
+      ]);
+      activeBattle = checks.some(Boolean);
+    } catch (error) {
+      console.error("[chweb] battle status lookup failed:", error?.message || error);
+      return sock.sendMessage(
+        jid,
+        { text: "⚠️ I couldn't verify both trainers' battle status, so I paused the challenge. Please try again shortly." },
+        { quoted: msg },
+      );
+    }
+    if (activeBattle) {
+      return sock.sendMessage(
+        jid,
+        { text: "❌ Both trainers must finish any active Pokémon battle before starting a new web battle." },
+        { quoted: msg },
+      );
+    }
 
     let party;
     let opponentParty;
