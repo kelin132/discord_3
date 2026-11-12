@@ -1,5 +1,6 @@
 import { getUser, saveUser, requireRegistration, isRegistered, addHistory, jailUser } from "./database.js";
 import { hasActiveGun } from "../../lib/economySecurity.mjs";
+import { economyWinRate } from "../../lib/economyOdds.mjs";
 import { compactMoney } from "../../lib/compactMoney.mjs";
 
 function fmt(n) {
@@ -149,7 +150,7 @@ export default {
     }
 
     const amount  = Math.min(10000, Math.floor(Math.random() * (target.money * 0.3)) + 100);
-    const success = Math.random() > 0.45;
+    const success = Math.random() < economyWinRate(0.55, robber);
     const targetId = discordTargetId || targetJid.split("@")[0];
     const tag = discordTargetId ? `<@${discordTargetId}>` : `@${targetId}`;
     const mentions = discordTargetId ? [`discord:${discordTargetId}`] : [targetJid];

@@ -12,6 +12,7 @@ import { formatGamblingResult } from "../../lib/gamblingFormat.mjs";
 import { flattenEconomyText, sendEconomyReply } from "../../lib/discordEconomyReply.mjs";
 import { compactMoney } from "../../lib/compactMoney.mjs";
 import { getBettingTier } from "./currency.js";
+import { economyWinRate } from "../../lib/economyOdds.mjs";
 
 const COOLDOWN = 30 * 1000;
 
@@ -147,7 +148,7 @@ export default {
       });
 
     const tier         = getBettingTier(amount);
-    const won          = Math.random() < tier.winRate;
+    const won          = Math.random() < economyWinRate(tier.winRate, user);
     const payout       = Math.floor(amount * tier.multiplier);
     const netWin       = payout - amount;
     const diamondReward = maybeAwardDiamonds(user, won ? 0.003 : 0.001, 1, 2);

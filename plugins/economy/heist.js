@@ -6,6 +6,7 @@
  */
 import { getUser, saveUser, requireRegistration, isRegistered, addHistory } from "./database.js";
 import { hasActiveGun } from "../../lib/economySecurity.mjs";
+import { economyWinRate } from "../../lib/economyOdds.mjs";
 
 const JOIN_WINDOW    = 60 * 1000;  // 60 seconds to join
 const MIN_STAKE      = 500;
@@ -247,7 +248,11 @@ ${names}
 
 async function executeHeist(sock, jid, heist) {
   const totalPot = heist.members.reduce((s, m) => s + m.stake, 0);
-  const won      = Math.random() < SUCCESS_RATE && heist.members.length >= MIN_MEMBERS;
+  const crewUsers = await Promise.all(heist.members.map(({ id }) => getUser(id)));
+  const crewWinRate = crewUsers.length
+    ? crewUsers.reduce((sum, user) => sum + economyWinRate(SUCCESS_RATE, user), 0) / crewUsers.length
+    : SUCCESS_RATE;
+  const won      = Math.random() < crewWinRate && heist.members.length >= MIN_MEMBERS;
   const mentions = heist.members.map(m => m.id);
   const tags     = heist.members.map(m => `@${m.id.split("@")[0]}`).join(" ");
 
